@@ -66,6 +66,22 @@ app.MapGet("/rooms/{roomId}", (int roomId) =>
 });
 
 // update room 
+app.MapPut("/rooms/{roomid}", (int roomId, Room room) =>
+{
+    if (roomId != room.Id) return Results.BadRequest();
+
+    Room foundRoom = rooms.FirstOrDefault(r => r.Id == roomId);
+
+    if (foundRoom == null) return Results.NotFound();
+
+    // only changes reference pointer
+    // foundRoom = room;
+
+    foundRoom.Name = room.Name;
+    foundRoom.MaxOccupancy = room.MaxOccupancy;
+
+    return Results.NoContent();
+});
 
 // delete a room
 
