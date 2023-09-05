@@ -43,6 +43,10 @@ app.UseHttpsRedirection();
 
 
 // get all rooms
+app.MapGet("/rooms", () =>
+{
+    return rooms;
+});
 
 // get room by id with roomates
 
