@@ -49,6 +49,21 @@ app.MapGet("/rooms", () =>
 });
 
 // get room by id with roomates
+app.MapGet("/rooms/{roomId}", (int roomId) =>
+{
+    Room foundRoom = rooms.FirstOrDefault(r => r.Id == roomId);
+
+    if (foundRoom == null)
+    {
+        return Results.NotFound();
+    }
+
+    List<Roommate> foundRoommates = roommates.Where(rm => rm.RoomId == roomId).ToList();
+
+    foundRoom.Roommates = foundRoommates;
+
+    return Results.Ok(foundRoom);
+});
 
 // update room 
 
