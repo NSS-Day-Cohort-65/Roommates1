@@ -11,15 +11,15 @@ List<Room> rooms = new List<Room>
 List<Roommate> roommates = new List<Roommate>
 {
     new Roommate {Id = 1, FirstName = "Nic", LastName = "Lahde", MovedInDate = new DateTime(2021, 1, 25), RentPortion = 20, RoomId = 2 },
-    new Roommate {Id = 1, FirstName = "Alex", LastName = "Bishop", MovedInDate = new DateTime(2021, 2, 15), RentPortion = 15, RoomId = 1 },
-    new Roommate {Id = 1, FirstName = "Dan", LastName = "Brady", MovedInDate = new DateTime(2021, 2, 10), RentPortion = 10, RoomId = 3 },
+    new Roommate {Id = 2, FirstName = "Alex", LastName = "Bishop", MovedInDate = new DateTime(2021, 2, 15), RentPortion = 15, RoomId = 1 },
+    new Roommate {Id = 3, FirstName = "Dan", LastName = "Brady", MovedInDate = new DateTime(2021, 2, 10), RentPortion = 10, RoomId = 3 },
 };
 
 List<Chore> chores = new List<Chore>
 {
     new Chore {Id = 1, Name = "Take Out Trash", RoommateId = 1 },
     new Chore {Id = 2, Name = "Vacuum", RoommateId = 2 },
-    new Chore {Id = 2, Name = "Do Dishes"},
+    new Chore {Id = 3, Name = "Do Dishes"},
 };
 
 
@@ -84,6 +84,23 @@ app.MapPut("/rooms/{roomid}", (int roomId, Room room) =>
 });
 
 // delete a room
+app.MapDelete("/rooms/{id}", (int id) => 
+{
+    Room roomToDelete = rooms.SingleOrDefault(r => r.Id == id);
+    if (roomToDelete == null)
+    {
+        return Results.NotFound();
+    }
+    List<Roommate> roommatesToMove = roommates.Where(rm => rm.RoomId == id).ToList();
+    foreach (Roommate roomie in roommatesToMove)
+    {
+        roomie.RoomId = null;
+    }
+
+    rooms.Remove(roomToDelete);
+
+    return Results.NoContent();
+});
 
 // get roommates
 
