@@ -104,7 +104,27 @@ app.MapDelete("/rooms/{id}", (int id) =>
 
 // get roommates
 
+app.MapGet("/roommates", () => {
+    return Results.Ok(roommates);
+});
+
 // get roommate with chores
+
+app.MapGet("/roommates/{id}", (int id) => {
+    Roommate foundRoommate = roommates.SingleOrDefault(rm => rm.Id == id);
+
+    if (foundRoommate == null)
+    {
+        return Results.NotFound();
+    }
+
+    List<Chore> foundChores = chores.Where(c => c.RoommateId == id).ToList();
+
+    foundRoommate.Chores = foundChores;
+
+    return Results.Ok(foundRoommate);
+
+});
 
 // add a roommate 
 
