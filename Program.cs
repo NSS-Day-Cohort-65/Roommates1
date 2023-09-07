@@ -127,7 +127,12 @@ app.MapGet("/roommates/{id}", (int id) => {
 });
 
 // add a roommate 
-
+app.MapPost("/roommates", (Roommate roommate) => {
+    roommate.Id = roommates.Count > 0 ? roommates.Max(r => r.Id) + 1 : 1;
+    roommate.MovedInDate = DateTime.Today;
+    roommates.Add(roommate);
+    return Results.Created($"/roommates/{roommate.Id}", roommate);
+});
 // assign a roommate to a chore
 
 // calculate rent for each roommate and return a report
