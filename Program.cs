@@ -1,5 +1,8 @@
 using Roommates.Models;
 
+// constant in snake case
+const int TOTAL_RENT = 1000;
+
 List<Room> rooms = new List<Room>
 {
     new Room { Id = 1, MaxOccupancy = 2, Name = "Bedroom 1"},
@@ -84,7 +87,7 @@ app.MapPut("/rooms/{roomid}", (int roomId, Room room) =>
 });
 
 // delete a room
-app.MapDelete("/rooms/{id}", (int id) => 
+app.MapDelete("/rooms/{id}", (int id) =>
 {
     Room roomToDelete = rooms.SingleOrDefault(r => r.Id == id);
     if (roomToDelete == null)
@@ -104,13 +107,15 @@ app.MapDelete("/rooms/{id}", (int id) =>
 
 // get roommates
 
-app.MapGet("/roommates", () => {
+app.MapGet("/roommates", () =>
+{
     return Results.Ok(roommates);
 });
 
 // get roommate with chores
 
-app.MapGet("/roommates/{id}", (int id) => {
+app.MapGet("/roommates/{id}", (int id) =>
+{
     Roommate foundRoommate = roommates.SingleOrDefault(rm => rm.Id == id);
 
     if (foundRoommate == null)
@@ -127,15 +132,49 @@ app.MapGet("/roommates/{id}", (int id) => {
 });
 
 // add a roommate 
-app.MapPost("/roommates", (Roommate roommate) => {
+app.MapPost("/roommates", (Roommate roommate) =>
+{
     roommate.Id = roommates.Count > 0 ? roommates.Max(r => r.Id) + 1 : 1;
     roommate.MovedInDate = DateTime.Today;
     roommates.Add(roommate);
     return Results.Created($"/roommates/{roommate.Id}", roommate);
 });
 // assign a roommate to a chore
+app.MapPost("/chores/{choreId}/assign/{roommateId}", (int roommateId, int choreId) =>
+{
+    Chore foundChore = chores.FirstOrDefault(c => c.Id == choreId);
 
+    bool roommateExists = roommates.Any(r => r.Id == roommateId);
+
+    if (roommateExists && foundChore != null)
+    {
+        foundChore.RoommateId = roommateId;
+
+        return Results.NoContent();
+    }
+
+    return Results.NotFound();
+
+});
 // calculate rent for each roommate and return a report
-
+app.MapGet("/totalrent", () =>
+{
+    // create place to store solution
+    var totalRent = new Dictionary<string, decimal>();
+    // loop through roommates
+    foreach (var roommate in roommates)
+    {
+        // add to solution
+        totalRent.Add(roommate.FullName, roommate.Rent);
+    }
+    totalRent.Add("total rent", TOTAL_RENT);
+    // return solution
+    return Results.Ok(totalRent);
+});
 
 app.Run();
+
+// Array - fixed length, useful for storing data that you don't need to change
+// List - like JS array, can use .Add()
+// Dictionary - like JS Object, Key Value pairs
+// Enum - can access data as properties 
